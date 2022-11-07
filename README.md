@@ -1,2 +1,11 @@
-# PubKey_FileSharing
-Final proyect for the Security course
+Transferencia de archivos con chequeo de integridad con clave pública
+=====================================================================
+
+Proceso
+-------
+
+Dificultades
+------------
+
+Conclusiones
+------------
