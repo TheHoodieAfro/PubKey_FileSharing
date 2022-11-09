@@ -58,11 +58,11 @@ def decryptFile(file):
     while True:
         path = "./data/file{}.txt".format(c)
         if os.path.exists(path):
-            decryptedFile = open(path, "a")
+            decryptedFile = open(path, "w")
             break
         c += 1
 
     decryptedFile.write(data.decode("utf-8"))
-    decryptedFile .close()
+    decryptedFile.close()
 
     return decryptedFile
