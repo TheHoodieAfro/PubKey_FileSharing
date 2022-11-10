@@ -2,6 +2,10 @@ import socket
 import tqdm
 import os
 
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import AES, PKCS1_OAEP
+from Crypto.Random import get_random_bytes
+
 SEPARATOR = "<SEPARATOR>"
 BUFFER_SIZE = 4096
 
@@ -17,6 +21,24 @@ s = socket.socket()
 print(f"[+] Connecting to {host}:{port}")
 s.connect((host, port))
 print("[+] Connected.")
+
+received = s.recv(BUFFER_SIZE).decode()
+filenameTest, filesizeTest = received.split(SEPARATOR)
+filenameTest = os.path.basename(filenameTest)
+filesizeTest = int(filesizeTest)
+
+progress = tqdm.tqdm(range(filesizeTest), f"Receiving {filenameTest}", unit="B", unit_scale=True, unit_divisor=1024)
+with open('{}/public_keys/{}'.format(os.path.dirname(__file__), filenameTest), "wb") as f:
+    while True:
+        bytes_read = s.recv(BUFFER_SIZE)
+        if not bytes_read:    
+            break
+
+        f.write(bytes_read)
+
+        progress.update(len(bytes_read))
+
+session_key = get_random_bytes(16)
 
 s.send(f"{filename}{SEPARATOR}{filesize}".encode())
 

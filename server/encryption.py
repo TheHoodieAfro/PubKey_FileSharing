@@ -7,24 +7,24 @@ from Crypto.Cipher import AES, PKCS1_OAEP
 def generateKeyPair():
     key = RSA.generate(2048)
     private_key = key.export_key()
-    file_out = open("./keys/private.pem", "wb")
+    file_out = open(os.path.dirname(__file__) +"/keys/private.pem", "wb")
     file_out.write(private_key)
     file_out.close()
 
     public_key = key.publickey().export_key()
-    file_out = open("./keys/public.pem", "wb")
+    file_out = open(os.path.dirname(__file__) +"/keys/public.pem", "wb")
     file_out.write(public_key)
     file_out.close()
 
 def getPrivateKey():
-    f = open('./keys/private.pem"','r')
+    f = open(os.path.dirname(__file__) +'/keys/private.pem','r')
     private_key = RSA.import_key(f.read())
     f.close()
 
     return private_key
 
 def getPublicKey():
-    f = open('./keys/public.pem"','r')
+    f = open(os.path.dirname(__file__) +'/keys/public.pem','r')
     public_key = RSA.import_key(f.read())
     f.close()
 
