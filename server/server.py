@@ -28,7 +28,7 @@ filesize = os.path.getsize(file)
 
 client_socket.send(f"{filename}{SEPARATOR}{filesize}".encode())
 
-progress = tqdm.tqdm(range(filesize), f"Sending public key", unit="B", unit_scale=True, unit_divisor=1024)
+progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
 with open(file, "rb") as f:
     while True:
 
@@ -47,12 +47,17 @@ filesize = int(filesize)
 
 progress = tqdm.tqdm(range(filesize), f"Receiving {filename}", unit="B", unit_scale=True, unit_divisor=1024)
 with open('{}/data/{}'.format(os.path.dirname(__file__), filename), "wb") as f:
+    total = 0
     while True:
+        if total >= filesize:
+            break
         bytes_read = client_socket.recv(BUFFER_SIZE)
-        if not bytes_read:    
+        total = len(bytes_read)
+        if not bytes_read:
             break
 
         f.write(bytes_read)
+        total += len(bytes_read)
 
         progress.update(len(bytes_read))
 

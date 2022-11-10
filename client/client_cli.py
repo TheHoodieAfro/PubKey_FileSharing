@@ -29,12 +29,17 @@ filesizeTest = int(filesizeTest)
 
 progress = tqdm.tqdm(range(filesizeTest), f"Receiving {filenameTest}", unit="B", unit_scale=True, unit_divisor=1024)
 with open('{}/public_keys/{}'.format(os.path.dirname(__file__), filenameTest), "wb") as f:
+    total = 0
     while True:
+        if total >= filesizeTest:
+            break
         bytes_read = s.recv(BUFFER_SIZE)
-        if not bytes_read:    
+        total = len(bytes_read)
+        if not bytes_read:
             break
 
         f.write(bytes_read)
+        total += len(bytes_read)
 
         progress.update(len(bytes_read))
 
