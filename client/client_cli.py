@@ -1,9 +1,11 @@
+import os
+import random
 import socket
-import tqdm
-import os, random, struct
+import struct
 
-from Crypto.PublicKey import RSA
+import tqdm
 from Crypto.Cipher import AES, PKCS1_OAEP
+from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 
 SEPARATOR = "<SEPARATOR>"
@@ -69,7 +71,14 @@ with open(file, 'rb') as infile:
 
                 outfile.write(encryptor.encrypt(chunk))
 
-s.send(f"{filename}{SEPARATOR}{filesize}".encode())
+filename = filename +'.enc'
+file = os.path.dirname(__file__) +'/encrypted_data/'+ filename
+filesize = os.path.getsize(file)
+
+print(filesize)
+print(filename)
+s.send(sessionEnc)
+s.send("{}{}{}".format(filename, SEPARATOR, filesize).encode())
 
 progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
 with open(file, "rb") as f:
