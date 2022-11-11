@@ -1,6 +1,6 @@
 import socket
 import tqdm
-import os
+import os, random, struct
 
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
@@ -43,7 +43,31 @@ with open('{}/public_keys/{}'.format(os.path.dirname(__file__), filenameTest), "
 
         progress.update(len(bytes_read))
 
-session_key = get_random_bytes(16)
+session = get_random_bytes(16)
+f = open(os.path.dirname(__file__) +'/public_keys/public.pem','r')
+public_key = RSA.import_key(f.read())
+f.close()
+
+cipherRSA = PKCS1_OAEP.new(public_key)
+sessionEnc = cipherRSA.encrypt(session)
+
+iv = get_random_bytes(16)
+encryptor = AES.new(session, AES.MODE_CBC, iv)
+
+chunksize=64*1024
+with open(file, 'rb') as infile:
+        with open(os.path.dirname(__file__) +'/encrypted_data/'+ filename +'.enc', "wb") as outfile:
+            outfile.write(struct.pack('<Q', filesize))
+            outfile.write(iv)
+
+            while True:
+                chunk = infile.read(chunksize)
+                if len(chunk) == 0:
+                    break
+                elif len(chunk) % 16 != 0:
+                    chunk += b' ' * (16 - len(chunk) % 16)
+
+                outfile.write(encryptor.encrypt(chunk))
 
 s.send(f"{filename}{SEPARATOR}{filesize}".encode())
 
