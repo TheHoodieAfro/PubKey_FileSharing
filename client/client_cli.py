@@ -1,7 +1,7 @@
 import os
-import random
 import socket
 import struct
+import sys
 
 import tqdm
 from Crypto.Cipher import AES, PKCS1_OAEP
@@ -14,7 +14,7 @@ BUFFER_SIZE = 4096
 host = "localhost"
 port = 5001
 
-file = input('file to send: ')
+file = sys.argv[1]
 filename = os.path.basename(file)
 filesize = os.path.getsize(file)
 
@@ -75,10 +75,11 @@ filename = filename +'.enc'
 file = os.path.dirname(__file__) +'/encrypted_data/'+ filename
 filesize = os.path.getsize(file)
 
-print(filesize)
-print(filename)
 s.send(sessionEnc)
-s.send("{}{}{}".format(filename, SEPARATOR, filesize).encode())
+sent = filename +""+ SEPARATOR +""+ str(filesize)
+print(sent)
+print(sent.encode())
+s.send(sent.encode())
 
 progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
 with open(file, "rb") as f:

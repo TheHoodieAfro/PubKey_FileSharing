@@ -44,7 +44,10 @@ with open(file, "rb") as f:
         progress.update(len(bytes_read))
 
 sessionEnc = client_socket.recv(BUFFER_SIZE)
-received = client_socket.recv(BUFFER_SIZE).decode()
+receivedcoded = client_socket.recv(BUFFER_SIZE)
+print(receivedcoded)
+received = receivedcoded.decode()
+print(received)
 filename, filesize = received.split(SEPARATOR)
 filename = os.path.basename(filename)
 filesize = int(filesize)
