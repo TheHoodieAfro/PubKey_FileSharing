@@ -44,9 +44,7 @@ with open('{}/keys/{}'.format(os.path.dirname(__file__), filenameTest), "wb") as
 
 session = generateSessionKey()
 
-public_key = getPublicKey()
-
-sessionEnc = encryptKey(public_key, session)
+sessionEnc = encryptKey(session)
 
 encryptFile(session, file, filename, filesize)
 
