@@ -1,71 +1,73 @@
 import os
 import socket
 import sys
-
 import tqdm
-from encryption import encryptFile, encryptKey, getPublicKey, generateSessionKey
+
+from encryption import encryptFile, encryptKey, generateSessionKey
 
 SEPARATOR = "<SEPARATOR>"
 BUFFER_SIZE = 4096
 
-host = "localhost"
-port = 5001
+SERVER_HOST = "localhost"
+SERVER_PORT = 5001
 
 file = sys.argv[1]
 filename = os.path.basename(file)
 filesize = os.path.getsize(file)
 
-s = socket.socket()
+client_socket = socket.socket()
 
-print(f"[+] Connecting to {host}:{port}")
-s.connect((host, port))
+print(f"[+] Connecting to {SERVER_HOST}:{SERVER_PORT}")
+client_socket.connect((SERVER_HOST, SERVER_PORT))
 print("[+] Connected.")
 
-received = s.recv(BUFFER_SIZE).decode()
-filenameTest, filesizeTest = received.split(SEPARATOR)
-filenameTest = os.path.basename(filenameTest)
-filesizeTest = int(filesizeTest)
+public_key_package = client_socket.recv(BUFFER_SIZE).decode()
+public_key_name, public_key_size = public_key_package.split(SEPARATOR)
 
-progress = tqdm.tqdm(range(filesizeTest), f"Receiving {filenameTest}", unit="B", unit_scale=True, unit_divisor=1024)
-with open('{}/keys/{}'.format(os.path.dirname(__file__), filenameTest), "wb") as f:
-    total = 0
+public_key_name = os.path.basename(public_key_name)
+public_key_size = int(public_key_size)
+
+progress_bar = tqdm.tqdm(range(public_key_size), f"Receiving {public_key_name}", unit="B", unit_scale=True, unit_divisor=1024)
+with open('{}/keys/{}'.format(os.path.dirname(__file__), public_key_name), "wb") as file_in:
+    total_recieved = 0
     while True:
-        if total >= filesizeTest:
+        if total_recieved >= public_key_size:
             break
-        bytes_read = s.recv(BUFFER_SIZE)
-        total = len(bytes_read)
-        if not bytes_read:
+        bytes_readed = client_socket.recv(BUFFER_SIZE)
+        total_recieved = len(bytes_readed)
+        if not bytes_readed:
             break
 
-        f.write(bytes_read)
-        total += len(bytes_read)
+        file_in.write(bytes_readed)
+        total_recieved += len(bytes_readed)
 
-        progress.update(len(bytes_read))
+        progress_bar.update(len(bytes_readed))
 
-session = generateSessionKey()
+session_key = generateSessionKey()
 
-sessionEnc = encryptKey(session)
+session_key_enc = encryptKey(session_key)
 
-encryptFile(session, file, filename, filesize)
+encryptFile(session_key, file, filename, filesize)
 
-filename = filename +'.enc'
-file = os.path.dirname(__file__) +'/encrypted_data/'+ filename
-filesize = os.path.getsize(file)
+filename_enc = filename +'.enc'
+file_enc = os.path.dirname(__file__) +'/encrypted_data/'+ filename_enc
+filesize_enc = os.path.getsize(file_enc)
 
-s.send(sessionEnc)
-sent = filename +""+ SEPARATOR +""+ str(filesize)
-s.send(sent.encode())
+client_socket.send(session_key_enc)
 
-progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
-with open(file, "rb") as f:
+sent = filename_enc +""+ SEPARATOR +""+ str(filesize_enc)
+client_socket.send(sent.encode())
+
+progress_bar = tqdm.tqdm(range(filesize_enc), f"Sending {filename_enc}", unit="B", unit_scale=True, unit_divisor=1024)
+with open(file_enc, "rb") as file_out:
     while True:
 
-        bytes_read = f.read(BUFFER_SIZE)
-        if not bytes_read:
+        bytes_readed = file_out.read(BUFFER_SIZE)
+        if not bytes_readed:
             break
 
-        s.sendall(bytes_read)
+        client_socket.sendall(bytes_readed)
 
-        progress.update(len(bytes_read))
+        progress_bar.update(len(bytes_readed))
 
-s.close()
+client_socket.close()

@@ -71,16 +71,16 @@ def decryptFile(filename, session):
 
             file_out.truncate(origsize)
 
-def decryptKey(encrypted_session):
-
-    cipher_rsa = PKCS1_OAEP.new(getPrivateKey())
-    return cipher_rsa.decrypt(encrypted_session)
-
-def encryptKey(session):
-
-    cipher_rsa = PKCS1_OAEP.new(getPublicKey())
-    return cipher_rsa.encrypt(session)
-
 def generateSessionKey():
 
     return get_random_bytes(16)
+
+def encryptKey(session_key):
+
+    cipher_rsa = PKCS1_OAEP.new(getPublicKey())
+    return cipher_rsa.encrypt(session_key)
+
+def decryptKey(session_key_enc):
+
+    cipher_rsa = PKCS1_OAEP.new(getPrivateKey())
+    return cipher_rsa.decrypt(session_key_enc)

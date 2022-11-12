@@ -4,68 +4,71 @@ import os
 
 from encryption import generateKeyPair, decryptFile, decryptKey
 
+SEPARATOR = "<SEPARATOR>"
+BUFFER_SIZE = 4096
+
 SERVER_HOST = "localhost"
 SERVER_PORT = 5001
 
-BUFFER_SIZE = 4096
-SEPARATOR = "<SEPARATOR>"
+FILE_LOCATION = os.path.dirname(__file__)
 
-s = socket.socket()
-s.bind((SERVER_HOST, SERVER_PORT))
+server_socket = socket.socket()
+server_socket.bind((SERVER_HOST, SERVER_PORT))
+server_socket.listen(5)
+print(f"[+] Listening as {SERVER_HOST}:{SERVER_PORT}")
 
-s.listen(5)
-print(f"[*] Listening as {SERVER_HOST}:{SERVER_PORT}")
-
-client_socket, address = s.accept() 
+client_socket, address = server_socket.accept() 
 print(f"[+] {address} is connected.")
 
-if not os.path.exists('{}/keys/{}'.format(os.path.dirname(__file__), 'private.pem')) and not os.path.exists('{}/keys/{}'.format(os.path.dirname(__file__), 'public.pem')):
+keys_path = FILE_LOCATION +'/keys/'
+if not os.path.exists(keys_path +'private.pem') or not os.path.exists(keys_path +'public.pem'):
     generateKeyPair()
 
-file = os.path.dirname(__file__) +'/keys/public.pem'
-filename = os.path.basename(file)
-filesize = os.path.getsize(file)
+public_key_file = FILE_LOCATION +'/keys/public.pem'
+public_key_name = os.path.basename(public_key_file)
+public_key_size = os.path.getsize(public_key_file)
 
-client_socket.send(f"{filename}{SEPARATOR}{filesize}".encode())
+sent = public_key_name +""+ SEPARATOR +""+ str(public_key_size)
+client_socket.send(sent.encode())
 
-progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)
-with open(file, "rb") as f:
+progress_bar = tqdm.tqdm(range(public_key_size), f"Sending {public_key_name}", unit="B", unit_scale=True, unit_divisor=1024)
+with open(public_key_file, "rb") as file_out:
     while True:
 
-        bytes_read = f.read(BUFFER_SIZE)
-        if not bytes_read:
+        bytes_readed = file_out.read(BUFFER_SIZE)
+        if not bytes_readed:
             break
 
-        client_socket.sendall(bytes_read)
+        client_socket.sendall(bytes_readed)
 
-        progress.update(len(bytes_read))
+        progress_bar.update(len(bytes_readed))
 
-sessionEnc = client_socket.recv(BUFFER_SIZE)
-receivedcoded = client_socket.recv(BUFFER_SIZE)
-received = receivedcoded.decode()
-filename, filesize = received.split(SEPARATOR)
-filename = os.path.basename(filename)
-filesize = int(filesize)
+session_key_enc = client_socket.recv(BUFFER_SIZE)
+session_key = decryptKey(session_key_enc)
 
-session_key = decryptKey(sessionEnc)
+file_enc_package_encoded = client_socket.recv(BUFFER_SIZE)
+file_enc_package = file_enc_package_encoded.decode()
+file_enc_name, file_enc_size = file_enc_package.split(SEPARATOR)
+file_enc_name = os.path.basename(file_enc_name)
+file_enc_size = int(file_enc_size)
 
-progress = tqdm.tqdm(range(filesize), f"Receiving {filename}", unit="B", unit_scale=True, unit_divisor=1024)
-with open('{}/encrypted_data/{}'.format(os.path.dirname(__file__), filename), "wb") as f:
-    total = 0
+progress_bar = tqdm.tqdm(range(file_enc_size), f"Receiving {file_enc_name}", unit="B", unit_scale=True, unit_divisor=1024)
+with open('{}/encrypted_data/{}'.format(FILE_LOCATION, file_enc_name), "wb") as file_in:
+    total_recieved = 0
     while True:
-        if total >= filesize:
+        if total_recieved >= file_enc_size:
             break
-        bytes_read = client_socket.recv(BUFFER_SIZE)
-        total = len(bytes_read)
-        if not bytes_read:
+        bytes_readed = client_socket.recv(BUFFER_SIZE)
+        total_recieved = len(bytes_readed)
+        if not bytes_readed:
             break
 
-        f.write(bytes_read)
-        total += len(bytes_read)
+        file_in.write(bytes_readed)
+        total_recieved += len(bytes_readed)
 
-        progress.update(len(bytes_read))
+        progress_bar.update(len(bytes_readed))
 
-decryptFile(filename, session_key)
+decryptFile(file_enc_name, session_key)
 
 client_socket.close()
-s.close()
+server_socket.close()
