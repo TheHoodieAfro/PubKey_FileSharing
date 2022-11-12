@@ -1,12 +1,9 @@
 import os
 import socket
-import struct
 import sys
 
 import tqdm
-from Crypto.Cipher import AES, PKCS1_OAEP
-from Crypto.PublicKey import RSA
-from Crypto.Random import get_random_bytes
+from encryption import encryptFile, encryptKey, getPublicKey, generateSessionKey
 
 SEPARATOR = "<SEPARATOR>"
 BUFFER_SIZE = 4096
@@ -30,7 +27,7 @@ filenameTest = os.path.basename(filenameTest)
 filesizeTest = int(filesizeTest)
 
 progress = tqdm.tqdm(range(filesizeTest), f"Receiving {filenameTest}", unit="B", unit_scale=True, unit_divisor=1024)
-with open('{}/public_keys/{}'.format(os.path.dirname(__file__), filenameTest), "wb") as f:
+with open('{}/keys/{}'.format(os.path.dirname(__file__), filenameTest), "wb") as f:
     total = 0
     while True:
         if total >= filesizeTest:
@@ -45,31 +42,13 @@ with open('{}/public_keys/{}'.format(os.path.dirname(__file__), filenameTest), "
 
         progress.update(len(bytes_read))
 
-session = get_random_bytes(16)
-f = open(os.path.dirname(__file__) +'/public_keys/public.pem','r')
-public_key = RSA.import_key(f.read())
-f.close()
+session = generateSessionKey()
 
-cipherRSA = PKCS1_OAEP.new(public_key)
-sessionEnc = cipherRSA.encrypt(session)
+public_key = getPublicKey()
 
-iv = get_random_bytes(16)
-encryptor = AES.new(session, AES.MODE_CBC, iv)
+sessionEnc = encryptKey(public_key, session)
 
-chunksize=64*1024
-with open(file, 'rb') as infile:
-        with open(os.path.dirname(__file__) +'/encrypted_data/'+ filename +'.enc', "wb") as outfile:
-            outfile.write(struct.pack('<Q', filesize))
-            outfile.write(iv)
-
-            while True:
-                chunk = infile.read(chunksize)
-                if len(chunk) == 0:
-                    break
-                elif len(chunk) % 16 != 0:
-                    chunk += b' ' * (16 - len(chunk) % 16)
-
-                outfile.write(encryptor.encrypt(chunk))
+encryptFile(session, file, filename, filesize)
 
 filename = filename +'.enc'
 file = os.path.dirname(__file__) +'/encrypted_data/'+ filename
@@ -77,8 +56,6 @@ filesize = os.path.getsize(file)
 
 s.send(sessionEnc)
 sent = filename +""+ SEPARATOR +""+ str(filesize)
-print(sent)
-print(sent.encode())
 s.send(sent.encode())
 
 progress = tqdm.tqdm(range(filesize), f"Sending {filename}", unit="B", unit_scale=True, unit_divisor=1024)

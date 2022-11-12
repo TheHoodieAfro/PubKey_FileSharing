@@ -1,9 +1,8 @@
 import socket
 import tqdm
-import os, struct
+import os
 
-from encryption import generateKeyPair, getPrivateKey, getPublicKey
-from Crypto.Cipher import AES, PKCS1_OAEP
+from encryption import generateKeyPair, decryptFile, decryptKey
 
 SERVER_HOST = "localhost"
 SERVER_PORT = 5001
@@ -22,8 +21,6 @@ print(f"[+] {address} is connected.")
 
 if not os.path.exists('{}/keys/{}'.format(os.path.dirname(__file__), 'private.pem')) and not os.path.exists('{}/keys/{}'.format(os.path.dirname(__file__), 'public.pem')):
     generateKeyPair()
-privateKey = getPrivateKey()
-publicKey = getPublicKey()
 
 file = os.path.dirname(__file__) +'/keys/public.pem'
 filename = os.path.basename(file)
@@ -45,15 +42,12 @@ with open(file, "rb") as f:
 
 sessionEnc = client_socket.recv(BUFFER_SIZE)
 receivedcoded = client_socket.recv(BUFFER_SIZE)
-print(receivedcoded)
 received = receivedcoded.decode()
-print(received)
 filename, filesize = received.split(SEPARATOR)
 filename = os.path.basename(filename)
 filesize = int(filesize)
 
-cipher_rsa = PKCS1_OAEP.new(privateKey)
-session_key = cipher_rsa.decrypt(sessionEnc)
+session_key = decryptKey(sessionEnc)
 
 progress = tqdm.tqdm(range(filesize), f"Receiving {filename}", unit="B", unit_scale=True, unit_divisor=1024)
 with open('{}/encrypted_data/{}'.format(os.path.dirname(__file__), filename), "wb") as f:
@@ -71,21 +65,7 @@ with open('{}/encrypted_data/{}'.format(os.path.dirname(__file__), filename), "w
 
         progress.update(len(bytes_read))
 
-with open(os.path.dirname(__file__) +'/encrypted_data/'+ filename, 'rb') as infile:
-    origsize = struct.unpack('<Q', infile.read(struct.calcsize('Q')))[0]
-    iv = infile.read(16)
-    decryptor = AES.new(session_key, AES.MODE_CBC, iv)
-    uno, dos = os.path.splitext(filename)
-    chunksize=24*1024
-
-    with open('{}/data/{}'.format(os.path.dirname(__file__), uno), 'wb') as outfile:
-        while True:
-            chunk = infile.read(chunksize)
-            if len(chunk) == 0:
-                break
-            outfile.write(decryptor.decrypt(chunk))
-
-        outfile.truncate(origsize)
+decryptFile(filename, session_key)
 
 client_socket.close()
 s.close()
