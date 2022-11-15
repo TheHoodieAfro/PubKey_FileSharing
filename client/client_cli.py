@@ -2,6 +2,7 @@ import os
 import socket
 import sys
 import tqdm
+import time
 
 from encryption import encryptFile, encryptKey, generateSessionKey
 
@@ -56,7 +57,10 @@ filesize_enc = os.path.getsize(file_enc)
 client_socket.send(session_key_enc)
 
 sent = filename_enc +""+ SEPARATOR +""+ str(filesize_enc)
-client_socket.send(sent.encode())
+test = sent.encode()
+client_socket.send(test)
+
+time.sleep(0.5)
 
 progress_bar = tqdm.tqdm(range(filesize_enc), f"Sending {filename_enc}", unit="B", unit_scale=True, unit_divisor=1024)
 with open(file_enc, "rb") as file_out:

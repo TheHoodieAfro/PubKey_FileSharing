@@ -47,6 +47,7 @@ session_key_enc = client_socket.recv(BUFFER_SIZE)
 session_key = decryptKey(session_key_enc)
 
 file_enc_package_encoded = client_socket.recv(BUFFER_SIZE)
+
 file_enc_package = file_enc_package_encoded.decode()
 file_enc_name, file_enc_size = file_enc_package.split(SEPARATOR)
 file_enc_name = os.path.basename(file_enc_name)
