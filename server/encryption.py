@@ -1,4 +1,5 @@
 import os, struct
+import base64
 
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
@@ -80,9 +81,11 @@ def generateSessionKey():
 def encryptKey(session_key):
 
     cipher_rsa = PKCS1_OAEP.new(getPublicKey())
-    return cipher_rsa.encrypt(session_key)
+    session_key_enc = cipher_rsa.encrypt(session_key)
+    return base64.b64encode(session_key_enc)
 
 def decryptKey(session_key_enc):
 
     cipher_rsa = PKCS1_OAEP.new(getPrivateKey())
-    return cipher_rsa.decrypt(session_key_enc)
+    session_key = base64.b64decode(session_key_enc)
+    return cipher_rsa.decrypt(session_key)
