@@ -2,7 +2,7 @@ import socket
 import tqdm
 import os
 
-from encryption import generateKeyPair, decryptFile, decryptKey
+from encryption import generateKeyPair, decryptFile, decryptKey, hashFile
 
 SEPARATOR = "<SEPARATOR>"
 BUFFER_SIZE = 4096
@@ -70,6 +70,9 @@ with open('{}/encrypted_data/{}'.format(FILE_LOCATION, file_enc_name), "wb") as 
         progress_bar.update(len(bytes_readed))
 
 decryptFile(file_enc_name, session_key)
+
+print(hashFile('{}/data/{}'.format(FILE_LOCATION, os.path.splitext(file_enc_name)[0])))
+print('{}/data/{}'.format(FILE_LOCATION, os.path.splitext(file_enc_name)[0]))
 
 client_socket.close()
 server_socket.close()

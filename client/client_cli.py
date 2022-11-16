@@ -4,7 +4,7 @@ import sys
 import tqdm
 import time
 
-from encryption import encryptFile, encryptKey, generateSessionKey
+from encryption import encryptFile, encryptKey, generateSessionKey, hashFile
 
 SEPARATOR = "<SEPARATOR>"
 BUFFER_SIZE = 4096
@@ -60,7 +60,7 @@ sent = filename_enc +""+ SEPARATOR +""+ str(filesize_enc)
 test = sent.encode()
 client_socket.send(test)
 
-time.sleep(0.5)
+time.sleep(1)
 
 progress_bar = tqdm.tqdm(range(filesize_enc), f"Sending {filename_enc}", unit="B", unit_scale=True, unit_divisor=1024)
 with open(file_enc, "rb") as file_out:
@@ -73,5 +73,8 @@ with open(file_enc, "rb") as file_out:
         client_socket.sendall(bytes_readed)
 
         progress_bar.update(len(bytes_readed))
+
+print(hashFile(file))
+print(file)
 
 client_socket.close()

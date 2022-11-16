@@ -1,5 +1,6 @@
 import os, struct
 import base64
+import hashlib
 
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import AES, PKCS1_OAEP
@@ -89,3 +90,13 @@ def decryptKey(session_key_enc):
     cipher_rsa = PKCS1_OAEP.new(getPrivateKey())
     session_key = base64.b64decode(session_key_enc)
     return cipher_rsa.decrypt(session_key)
+
+def hashFile(file_path):
+
+    sha256_hash = hashlib.sha256()
+    with open(file_path,"rb") as f:
+        for byte_block in iter(lambda: f.read(4096),b""):
+            sha256_hash.update(byte_block)
+        file_hash = sha256_hash.hexdigest()
+
+    return file_hash
