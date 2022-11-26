@@ -16,15 +16,20 @@ El problema consiste en dos aspectos fundamentales, la separacion entre el clien
 
 Creacion de la conexion tcp
 
-para poder crear la conexion mediante tcp utilizaremos la libreria socket de python. 
+para poder crear la conexion mediante tcp utilizaremos la libreria socket de python. Socket nos permite conectar dos nodos en una red. De esta manera se pueden comunicar entre si. Esta librearia ademas nos permite especificar el protocolo de comunicacion que queremos (TCP). Ademas esta libreria nos permite de manera muy facil establecer la conexion y el envio de archivos entre nodos.
 
 Creacion de las llaves
 
+La creacion del par de llaves es hecha en el archivo encryption en el nodo del servidor. La creacion del par de llaves es hecho por un metodo que genera las llaves utilizando la libreria RSA del paquete Crytpo de python. Simplemente se le asignan las especificaciones deseadas y la direccion donde se queire que se creen las llaves y estas son generadas por la libreria.
+
+
 Creacion de metodos de cifrado
 
-Creacion de metodos de decifrado
+El manejo de todas las funciones de encriptacion se encuentran en ambos servidor como cliente en un archivo llamado encriptacion. Este archivo importa funciones del paquete Cripto de python que le permite el acceso a funciones de encriptacion y decriptaicon. Creamos funciones que mediante metodos ofrecidos por esta libreria podamos encriptar y decriptar con las llaves publicas y privadas junto con el calculo de la funcion SHA - 256 para el cliente y el servidor.
 
 Acoplado de todas las funcionalidades
+
+Las estructura de la solucion esta compuesta por dos proyectos de python, Servidor y cliente. cada uno con sus respectivos archivos de encriptacion, y una clase principal donde se ejecuta el proceso desde la inicializacion de la conexion hasta terminar el intercambio. 
 
 Dificultades
 ------------
