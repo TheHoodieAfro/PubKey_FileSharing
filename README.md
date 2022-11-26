@@ -12,7 +12,11 @@ Proceso
 
 Entendimiento del problema
 
+El problema consiste en dos aspectos fundamentales, la separacion entre el cliente y servidor, y la generacion y calculo de los hashes y las llaves publicas y privadas. Primero debemos encontrar una libreria que nos ofrezca servicios de comunicacion entre dos programas. De esta manera enivaremos los archiovs y las confirmaciones. Segundo debemos encontrar librerias que nos proporcionen con funciones para poder generar un par de llaves (public y privada), ademas que nos ofresca una funcion para cifrar archivos y que nos permita cacular un hash SHA-256. Con estas especificaciones decidimos que la mejor alternativa para poder desarrollar este proyecto seria python. No solo por su facil uso sino ademas porque existen librerias amplias de criptografias que nos brindan las funciones que necesitamos. Al igual que la experiencia previa que tenemos manejando este tipo de lenguaje. 
+
 Creacion de la conexion tcp
+
+para poder crear la conexion mediante tcp utilizaremos la libreria socket de python. 
 
 Creacion de las llaves
 
