@@ -12,31 +12,30 @@ Proceso
 
 ### Entendimiento del problema
 
-El problema consiste en dos aspectos fundamentales, la separacion entre el cliente y servidor, y la generacion y calculo de los hashes y las llaves publicas y privadas. Primero debemos encontrar una libreria que nos ofrezca servicios de comunicacion entre dos programas. De esta manera enivaremos los archiovs y las confirmaciones. Segundo debemos encontrar librerias que nos proporcionen con funciones para poder generar un par de llaves (public y privada), ademas que nos ofresca una funcion para cifrar archivos y que nos permita cacular un hash SHA-256. Con estas especificaciones decidimos que la mejor alternativa para poder desarrollar este proyecto seria python. No solo por su facil uso sino ademas porque existen librerias amplias de criptografias que nos brindan las funciones que necesitamos. Al igual que la experiencia previa que tenemos manejando este tipo de lenguaje. 
+El problema consta de dos aspectos fundamentales, la separación entre el cliente y servidor, y la generacion y calculo de los hashes y las llaves públicas y privadas. Primero debemos encontrar una libreria que nos ofrezca servicios de comunicación entre dos programas. De esta manera enivaremos los archivos y las confirmaciones. Segundo debemos encontrar librerias que nos proporcionen con funciones para poder generar un par de llaves (pública y privada), ademas que nos ofrezcan una funciónn para cifrar archivos y nos permitan cacular un hash SHA-256. Con estas especificaciones decidimos que la mejor alternativa para poder desarrollar este proyecto sería python. No solo por su facil uso sino ademas porque existen varias librerias de criptografías que nos brindan las funciones que necesitamos. Al igual que la experiencia previa que tenemos manejando este tipo de lenguaje. 
 
-Creacion de la conexion tcp
+### Creación de la conexion TCP
 
-para poder crear la conexion mediante tcp utilizaremos la libreria socket de python. Socket nos permite conectar dos nodos en una red. De esta manera se pueden comunicar entre si. Esta librearia ademas nos permite especificar el protocolo de comunicacion que queremos (TCP). Ademas esta libreria nos permite de manera muy facil establecer la conexion y el envio de archivos entre nodos.
+para poder crear la conexión mediante tcp utilizaremos la libreria socket de python. Socket nos permite conectar dos nodos en una red. De esta manera se pueden intercambiar información entre si. Esta libreria, además, nos permite especificar el protocolo de comunicación que queremos (TCP). Tambien consigue de manera muy fácil establecer la conexión y el envio de archivos entre nodos.
 
-Creacion de las llaves
+### Creación de las llaves
 
-La creacion del par de llaves es hecha en el archivo encryption en el nodo del servidor. La creacion del par de llaves es hecho por un metodo que genera las llaves utilizando la libreria RSA del paquete Crytpo de python. Simplemente se le asignan las especificaciones deseadas y la direccion donde se queire que se creen las llaves y estas son generadas por la libreria.
+La creación del par de llaves es hecha en el archivo *encryption* en el nodo del servidor. La creación del par de llaves es realiada por un método que genera las llaves utilizando la líbreria RSA del paquete Crytpo de python. Simplemente se le asignan las especificaciones deseadas y la dirección donde se quiere que se creen las llaves y estas son generadas por la líbreria.
 
+### Creación de métodos de cifrado
 
-Creacion de metodos de cifrado
+El manejo de todas las funciones de encriptación se encuentran en ambos, servidor y cliente, en un archivo llamado *encriptación*. Este archivo importa funciones del paquete Cripto de python que le permite el acceso a funciones de encriptacion y desencriptación. Creamos funciones que mediante métodos ofrecidos por esta líbreria podamos encriptar y decriptar con las llaves publicas y privadas junto con el cálculo de la funcion SHA - 256 para el cliente y el servidor.
 
-El manejo de todas las funciones de encriptacion se encuentran en ambos servidor como cliente en un archivo llamado encriptacion. Este archivo importa funciones del paquete Cripto de python que le permite el acceso a funciones de encriptacion y decriptaicon. Creamos funciones que mediante metodos ofrecidos por esta libreria podamos encriptar y decriptar con las llaves publicas y privadas junto con el calculo de la funcion SHA - 256 para el cliente y el servidor.
+### Acoplado de todas las funcionalidades
 
-Acoplado de todas las funcionalidades
-
-Las estructura de la solucion esta compuesta por dos proyectos de python, Servidor y cliente. cada uno con sus respectivos archivos de encriptacion, y una clase principal donde se ejecuta el proceso desde la inicializacion de la conexion hasta terminar el intercambio. 
+Las estructura de la solución esta compuesta por dos proyectos de python, servidor y cliente. cada uno con sus respectivos archivos de encriptación, y una clase principal donde se ejecuta el proceso desde la inicialización de la conexión hasta terminar el intercambio. 
 
 Dificultades
 ------------
-Entender documentacion
+Quiza dentro de los mayores problemas encontrados a la hora de realizar este proyecto, fue entender la documentación disponible para cada una de las librerias utilizadas en la solucion y en python. Con ello, también, que muchos de los errores que el proyecto generaba fueron frustantes en tanto no se encontraban soluciones similares en internet o de lleno parecian ser exclusivos de este proyecto. Sin embargo, en la mayor parte de estos casos, un proceso de *debug* llevado a cabo de manera correcta y el apoyo en la documentación revisada de manera exhaustiva, logro que fuera posible resolver correctamente el problema propuesto.
 
-Entender ejemplos y decidir cuales metodos eran utiles
+Además, agregamos que, de los ejemplos disponibles que se usaron como guía, la mayoria de ellos parecian ser redundantes por lo que tratar de entender su funcionamiento y tomar prestado conceptos o propuestas que fueran utiles también nos resulto complicado ya que, de lo propuesto en estos, la mayoria de las veces ninguna de nuestras elecciones fueron de utilidad, por lo que se requeria iterar de nuevo o buscar nuevas alternativas.
 
 Conclusiones
 ------------
-Con los conocimientos correctos es mas facil de lo que parece
+En primer lugar resaltar la facilidad con la que cuenta python para trabajar con propuestas enfocadas en la seguridad, esto ya que es un lenguaje flexible, sencillo y con un alcance muy amplio en terminos de administrar procesos criptográficos. Además, destacar que con los conocimientos correctos, realizar este proyecto resulta mucho mas sencillo de lo que aparenta ser.
