@@ -74,7 +74,6 @@ with open(file_enc, "rb") as file_out:
 
         progress_bar.update(len(bytes_readed))
 
-print(hashFile(file))
-print(file)
+client_socket.send(hashFile(file).encode())
 
 client_socket.close()

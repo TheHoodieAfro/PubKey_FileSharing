@@ -1,6 +1,7 @@
 import socket
 import tqdm
 import os
+import time
 
 from encryption import generateKeyPair, decryptFile, decryptKey, hashFile
 
@@ -71,8 +72,15 @@ with open('{}/encrypted_data/{}'.format(FILE_LOCATION, file_enc_name), "wb") as 
 
 decryptFile(file_enc_name, session_key)
 
-print(hashFile('{}/data/{}'.format(FILE_LOCATION, os.path.splitext(file_enc_name)[0])))
-print('{}/data/{}'.format(FILE_LOCATION, os.path.splitext(file_enc_name)[0]))
+hash_rcv = client_socket.recv(BUFFER_SIZE).decode()
+
+print('Calculated hash'+ hashFile('{}/data/{}'.format(FILE_LOCATION, os.path.splitext(file_enc_name)[0])))
+print('Recieved hash'+ hash_rcv)
+
+if hashFile('{}/data/{}'.format(FILE_LOCATION, os.path.splitext(file_enc_name)[0])) == hash_rcv:
+    print('POGGERS')
+else:
+    print('PEPESAD')
 
 client_socket.close()
 server_socket.close()
